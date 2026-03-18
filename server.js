@@ -4,6 +4,7 @@ const socketIO = require("socket.io");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const multer = require("multer");
+require("dotenv").config(); // for env variables
 
 const User = require("./models/user");
 const Message = require("./models/Message");
@@ -12,64 +13,68 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-// MongoDB connection
-mongoose.connect("mongodb://127.0.0.1:27017/chatapp");
+// ✅ MongoDB Atlas connection (FIXED)
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.log("❌ DB Error:", err));
 
 // middleware
 app.use(express.json());
 app.use(express.static("public"));
 
-// ROOT ROUTE (IMPORTANT)
+// ROOT ROUTE
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/public/login.html");
 });
 
 let onlineUsers = {};
 
-io.on("connection",(socket)=>{
+io.on("connection", (socket) => {
 
-socket.on("join",(username)=>{
+    socket.on("join", (username) => {
+        onlineUsers[socket.id] = username;
+        io.emit("onlineUsers", onlineUsers);
+    });
 
-onlineUsers[socket.id]=username;
+    socket.on("chatMessage", async (data) => {
+        try {
+            let msg = new Message({
+                sender: data.sender,
+                receiver: data.receiver,
+                message: data.message,
+                time: new Date().toLocaleTimeString()
+            });
 
-io.emit("onlineUsers",onlineUsers);
+            await msg.save();
 
-});
+            if (data.receiver === "all") {
+                io.emit("message", msg);
+            } else {
+                socket.to(data.receiver).emit("message", msg);
+                socket.emit("message", msg);
+            }
+        } catch (err) {
+            console.log("Message Error:", err);
+        }
+    });
 
-socket.on("chatMessage",async(data)=>{
+    socket.on("typing", (user) => {
+        socket.broadcast.emit("typing", user);
+    });
 
-let msg = new Message({
-
-sender:data.sender,
-receiver:data.receiver,
-message:data.message,
-time:new Date().toLocaleTimeString()
-
-});
-
-await msg.save();
-
-if(data.receiver==="all"){
-io.emit("message",msg);
-}
-else{
-socket.to(data.receiver).emit("message",msg);
-socket.emit("message",msg);
-}
-
-});
-
-socket.on("typing",(user)=>{
-socket.broadcast.emit("typing",user);
-});
-
-socket.on("disconnect",()=>{
-delete onlineUsers[socket.id];
-io.emit("onlineUsers",onlineUsers);
-});
+    socket.on("disconnect", () => {
+        delete onlineUsers[socket.id];
+        io.emit("onlineUsers", onlineUsers);
+    });
 
 });
 
-server.listen(3000,()=>{
-console.log("Server running on http://localhost:3000");
+// ✅ Dynamic PORT for Render (VERY IMPORTANT)
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });
