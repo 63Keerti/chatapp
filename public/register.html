@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Connect · register</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url('https://images.unsplash.com/photo-1499336315816-097655dcfbda?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            padding: 1rem;
+        }
+
+        /* soft overlay — matches login & chat pages */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            z-index: 0;
+        }
+
+        .register-card {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 40px;
+            width: 100%;
+            max-width: 460px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: transform 0.2s ease;
+        }
+
+        h2 {
+            font-size: 2.4rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #1f2a3a;
+            margin-bottom: 1.8rem;
+            text-shadow: 0 2px 3px rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        h2 span {
+            font-size: 2.4rem;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
+        }
+
+        .input-group {
+            margin-bottom: 1.6rem;
+        }
+
+        .input-icon {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.7);
+            border-radius: 60px;
+            padding: 0.1rem 1rem 0.1rem 1.5rem;
+            border: 1.5px solid rgba(255,255,255,0.9);
+            transition: all 0.15s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+
+        .input-icon:focus-within {
+            border-color: #3b6ea5;
+            background: white;
+            box-shadow: 0 8px 18px rgba(0,60,130,0.15);
+        }
+
+        .input-icon i {
+            font-size: 1.5rem;
+            margin-right: 0.8rem;
+            color: #2c3e50;
+        }
+
+        .input-icon input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 1rem 0.5rem 1rem 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #1a2634;
+            outline: none;
+        }
+
+        .input-icon input::placeholder {
+            color: #5f6b7a;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* hint row with friendly emojis (like login page had mood row) */
+        .emoji-cheer {
+            margin: 1.8rem 0 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: rgba(255,255,255,0.3);
+            padding: 0.8rem 0.5rem;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        .emoji-cheer span {
+            font-size: 2rem;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
+            transition: transform 0.2s;
+            cursor: default;
+        }
+
+        .emoji-cheer span:hover {
+            transform: scale(1.2);
+        }
+
+        /* register button */
+        .register-btn {
+            background: #1f3a5f;
+            border: none;
+            width: 100%;
+            padding: 1.2rem 1rem;
+            border-radius: 60px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 15px 25px rgba(0, 30, 70, 0.3);
+            border: 1px solid #89b9e2;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            margin: 1.2rem 0 1.5rem;
+        }
+
+        .register-btn:hover {
+            background: #143450;
+            transform: translateY(-3px);
+            box-shadow: 0 20px 30px rgba(0, 30, 70, 0.4);
+        }
+
+        .register-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        .login-redirect {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .login-redirect a {
+            color: #1f3a5f;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.4);
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.8);
+            display: inline-block;
+            transition: 0.1s;
+        }
+
+        .login-redirect a:hover {
+            background: white;
+            border-color: #3b6ea5;
+        }
+
+        /* mobile fine-tuning */
+        @media (max-width: 420px) {
+            .register-card {
+                padding: 2rem 1.2rem;
+                border-radius: 32px;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+            .emoji-cheer span {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* extra touch: terms hint */
+        .terms-note {
+            font-size: 0.8rem;
+            text-align: center;
+            opacity: 0.7;
+            margin-top: 1.2rem;
+            color: #1e2b3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-card">
+        <h2>
+            <span>📝</span> Register
+        </h2>
+
+        <!-- username field with icon (matches login page style) -->
+        <div class="input-group">
+            <div class="input-icon">
+                <i>👤</i>
+                <input type="text" id="username" placeholder="Username" autocomplete="off">
+            </div>
+        </div>
+
+        <!-- password field with lock icon -->
+        <div class="input-group">
+            <div class="input-icon">
+                <i>🔐</i>
+                <input type="password" id="password" placeholder="Password">
+            </div>
+        </div>
+
+        <!-- friendly emoji row — gives same vibe as login page's 😀😂😍👍❤️ -->
+        <div class="emoji-cheer">
+            <span>😊</span>
+            <span>🎉</span>
+            <span>🚀</span>
+            <span>💪</span>
+            <span>✨</span>
+            <span>🌈</span>
+        </div>
+
+        <!-- register button (calls register() function) -->
+        <button class="register-btn" onclick="handleRegister()">
+            <span>📋</span> Create account
+        </button>
+
+        <!-- subtle link back to login (keeps UX smooth) -->
+        <div class="login-redirect">
+            <a href="login.html">← back to login</a>
+        </div>
+
+        <div class="terms-note">
+            by joining you accept the emoji vibe ✨
+        </div>
+    </div>
+
+    <script>
+        // original register function as provided, but enhanced with validation + emoji spirit
+        async function register() {
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            // simple frontend validation (friendly)
+            if (!username || !password) {
+                alert('🙏 Please fill in both username and password');
+                return;
+            }
+            if (password.length < 3) {
+                alert('🔐 Password must be at least 3 characters (demo purpose)');
+                return;
+            }
+
+            try {
+                let res = await fetch("/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                if (res.ok) {
+                    alert('✅ User registered successfully! 🎉');
+                    // optional: redirect to login page after registration
+                    // window.location = 'login.html';   // you can enable if needed
+                } else {
+                    const errorText = await res.text();
+                    alert('⚠️ Registration failed: ' + (errorText || 'server error'));
+                }
+            } catch (error) {
+                alert('🌐 Network error — is your server running?\n' + error);
+            }
+        }
+
+        // wrapper to match onclick, but we keep the original function name accessible
+        window.handleRegister = function() {
+            register();
+        };
+
+        // also keep original register function available (already defined above)
+
+        // bonus: pre-fill demo? no, but we can add a tiny hint on password (but not needed)
+        // add a little console greeting to match modern feel
+        console.log('📝 registration page ready — emoji power 😊');
+    </script>
+
+    <!-- optional note: if you want to preserve the original exact register() without any extra,
+         it's already there. The button calls handleRegister which calls register.
+         This preserves original behaviour while adding validation. -->
+</body>
+</html>
