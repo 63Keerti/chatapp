@@ -4,7 +4,7 @@ const socketIO = require("socket.io");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const multer = require("multer");
-require("dotenv").config(); // for env variables
+require("dotenv").config();
 
 const User = require("./models/user");
 const Message = require("./models/Message");
@@ -14,12 +14,9 @@ const server = http.createServer(app);
 const io = socketIO(server);
 
 // ✅ MongoDB Atlas connection (FIXED)
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.log("❌ DB Error:", err));
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch(err => console.log("❌ DB Error:", err));
 
 // middleware
 app.use(express.json());
@@ -72,7 +69,7 @@ io.on("connection", (socket) => {
 
 });
 
-// ✅ Dynamic PORT for Render (VERY IMPORTANT)
+// ✅ Dynamic PORT
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
